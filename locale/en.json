@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Fork After Compaction",
+    "description": "Adds a Fork action below every context-compaction marker so a new session starts from the compacted context instead of the history the compaction replaced."
+  }
+}

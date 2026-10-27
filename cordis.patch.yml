@@ -1,0 +1,5 @@
+# The Host row activates the bundle; its dsh.client entry loads the browser
+# half, which contributes the compaction-anchored Fork row.
+- insert:
+    - id: dsh-fork-after-compaction
+      name: '@local/dsh-fork-after-compaction'
