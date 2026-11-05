@@ -234,6 +234,78 @@ test('one completed compaction becomes one action row at compaction/end', () => 
   assert.ok(node.anchorSeq > 13 && node.anchorSeq < 14, 'the row anchors after the compaction end')
 })
 
+test('a summarizer usage missing its cache buckets counts them as zero', () => {
+  const { definition } = mount()
+  const summary = summaryEvent(11, 'c-1')
+  const cacheless = {
+    ...summary,
+    data: { ...summary.data, usage: { inputTokens: 445, outputTokens: 3_029 } },
+  }
+  const node = nodeFor(definition, [startEvent(10, 'c-1'), cacheless, endEvent(13, 'c-1')])
+  assert.deepEqual(node.data.usage, {
+    cacheReadTokens: 0,
+    uncachedInputTokens: 445,
+    outputTokens: 3_029,
+    totalTokens: 3_474,
+  })
+})
+
+test('a summarizer usage without uncached-input or output counts keeps no pill data', () => {
+  const { definition } = mount()
+  const summary = summaryEvent(11, 'c-1')
+  for (const usage of [{ inputTokens: 445 }, { outputTokens: 3_029 }]) {
+    const partial = { ...summary, data: { ...summary.data, usage } }
+    const node = nodeFor(definition, [startEvent(10, 'c-1'), partial, endEvent(13, 'c-1')])
+    assert.equal(node.data.usage, null)
+  }
+})
+
+test('a summarizer usage with a corrupt cache bucket is dropped whole', () => {
+  const { definition } = mount()
+  const summary = summaryEvent(11, 'c-1')
+  const corrupt = {
+    ...summary,
+    data: { ...summary.data, usage: { inputTokens: 445, outputTokens: 3_029, cacheReadTokens: 'many' } },
+  }
+  const node = nodeFor(definition, [startEvent(10, 'c-1'), corrupt, endEvent(13, 'c-1')])
+  assert.equal(node.data.usage, null)
+})
+
+test('a cache-less summarizer call still publishes a zero-cache pill and dialog', () => {
+  resetHooks()
+  const { renderer } = mount()
+  const props = rowProps({
+    node: {
+      anchorSeq: 2_055.1,
+      data: {
+        seq: 2_055,
+        time: Date.now(),
+        summarySeq: 2_053,
+        provider: 'chatgpt',
+        model: 'gpt-5.1',
+        summaryText: 'summary',
+        usage: { cacheReadTokens: 0, uncachedInputTokens: 445, outputTokens: 3_029, totalTokens: 3_474 },
+      },
+    },
+  })
+  const first = render(renderer, props)
+  const all = elements(first)
+  const usage = all.find(element => element.props && element.props['data-dfac-usage'] !== undefined)
+  assert.equal(usage.props['data-dfac-cache-read'], '0')
+  assert.equal(usage.props['data-dfac-uncached-input'], '445')
+  assert.equal(usage.props['data-dfac-output'], '3029')
+  const text = all.filter(element => typeof element.props?.children?.[0] === 'string')
+  assert.ok(text.some(element => element.props.children[0] === '0/445/3K'))
+  usage.props.onClick()
+  const second = elements(render(renderer, props))
+  const labels = second.filter(element => element.type === 'dt').map(element => element.props.children[0])
+  const values = second.filter(element => element.type === 'dd').map(element => element.props.children[0] ?? element.props.children)
+  assert.deepEqual(labels, ['dialog.model', 'dialog.cacheHit', 'dialog.input', 'dialog.cacheRead', 'dialog.output'])
+  assert.equal(values[0], 'chatgpt/gpt-5.1')
+  assert.equal(values[1], '0%')
+  assert.deepEqual(values.slice(2), ['445 tok', '0 tok', '3,029 tok'])
+})
+
 test('a still-running compaction contributes no row', () => {
   const { definition } = mount()
   assert.equal(nodeFor(definition, [startEvent(10, 'c-1'), summaryEvent(11, 'c-1')]), null)

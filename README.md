@@ -32,6 +32,10 @@ where the compaction is.
   counters with the shipped database glyph. `dsh-statusbar-config` owns that
   format: it rewrites this row's text with the same formatter as the Turn pill
   (see below). Without that plugin the row shows an identical local fallback.
+  A summarizer that omits its cache buckets counts them as zero — the pill
+  reads `0/x/y` instead of disappearing, matching the statusbar plugin's
+  Turn-pill rule; only a call reporting neither uncached input nor output
+  keeps no pill.
 - **Usage dialog** mirrors the shipped Turn-usage dialog: exact total in the
   title, provider/model, cache hit, uncached input, cached input, cache write
   and output. The panel sits above the trigger, clamps inside the viewport,

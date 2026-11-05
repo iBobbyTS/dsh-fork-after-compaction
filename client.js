@@ -330,24 +330,38 @@ window.__ModuleLoader__.load({
       return text === '' ? null : text;
     }
 
-    /** Provider usage of a summarizer call as token buckets, or null. */
+    /** Non-negative integer count a provider reports for one bucket. */
+    function isCount(value) {
+      return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
+    }
+
+    /**
+     * Provider usage of a summarizer call as token buckets, or null.
+     *
+     * Mirrors dsh-statusbar-config's bucket normalization: uncached input and
+     * output must be reported for the call to have usage at all, while a
+     * missing cache bucket counts as zero, so a summarizer that omits its
+     * cache-read field still keeps a '0/x/y' pill instead of losing the row.
+     */
     function summaryUsage(event) {
       const raw = event.data.usage;
       if (raw === null || typeof raw !== 'object') return null;
       const input = raw.inputTokens;
-      const read = raw.cacheReadTokens;
       const output = raw.outputTokens;
-      if (!Number.isSafeInteger(input) || !Number.isSafeInteger(read) || !Number.isSafeInteger(output)) return null;
-      const write = raw.cacheWriteTokens;
+      if (!isCount(input) || !isCount(output)) return null;
+      if (raw.cacheReadTokens !== undefined && !isCount(raw.cacheReadTokens)) return null;
+      if (raw.cacheWriteTokens !== undefined && !isCount(raw.cacheWriteTokens)) return null;
+      const read = raw.cacheReadTokens ?? 0;
+      const write = raw.cacheWriteTokens ?? 0;
       const usage = {
         cacheReadTokens: read,
         uncachedInputTokens: input,
         outputTokens: output,
-        totalTokens: Number.isSafeInteger(raw.totalTokens)
+        totalTokens: isCount(raw.totalTokens)
           ? raw.totalTokens
-          : input + read + (Number.isSafeInteger(write) ? write : 0) + output,
+          : input + read + write + output,
       };
-      if (Number.isSafeInteger(write)) usage.cacheWriteTokens = write;
+      if (raw.cacheWriteTokens !== undefined) usage.cacheWriteTokens = write;
       return usage;
     }
 
