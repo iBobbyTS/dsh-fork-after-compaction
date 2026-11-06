@@ -70,7 +70,7 @@ function loadPlugin() {
     head: { append() {} },
     body: {},
   }
-  const source = readFileSync(new URL('../client.js', import.meta.url), 'utf8')
+  const source = readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8')
   new Function('window', 'document', source)(window, document)
   assert.ok(module !== undefined, 'artifact factory must return the plugin module')
   return module

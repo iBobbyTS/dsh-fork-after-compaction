@@ -1,2 +1,6 @@
 *.DS_Store
 .agent-work
+
+node_modules/
+.build/
+*.tgz

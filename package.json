@@ -4,23 +4,23 @@
   "private": true,
   "type": "module",
   "description": "Adds a Fork action below every compacted context marker so a new session starts from the compacted history.",
-  "main": "index.js",
+  "main": "lib/index.js",
   "exports": {
-    ".": "./index.js",
-    "./client": "./client.js",
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
     "./package.json": "./package.json",
     "./locale/*.json": "./locale/*.json",
     "./icon": "./icon.svg"
   },
   "files": [
-    "index.js",
-    "client.js",
     "cordis.patch.yml",
     "locale/*.json",
     "icon.svg",
     "README.md",
     "README.zh.md",
-    "docs"
+    "docs",
+    "lib",
+    "src"
   ],
   "dsh": {
     "bundle": {
@@ -48,6 +48,33 @@
   },
   "license": "MIT",
   "scripts": {
-    "test": "node --test test/*.test.js"
+    "typecheck": "tsc -p tsconfig.host.json && tsc -p tsconfig.client.json",
+    "build:runtime": "node scripts/build-runtime.mjs",
+    "test": "node scripts/check.mjs test",
+    "check:dist": "node scripts/check.mjs dist",
+    "check": "node scripts/check.mjs all"
+  },
+  "packageManager": "pnpm@10.28.2",
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "tsdown": "0.22.14",
+    "@types/node": "22.20.5",
+    "@types/react": "18.3.31",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "@types/react-dom": "18.3.7",
+    "@deepseek-ai/dsh-client-ui-conversation": "0.2.2-rc.1",
+    "@deepseek-ai/cordis": "4.1.0",
+    "@deepseek-ai/dsh-api-session-controller": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-client-ui-slots": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-session": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-client-locale": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-client-ui-renderer": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-compaction": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-client-ui-chat": "0.2.2-rc.1"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   }
 }
