@@ -73,5 +73,5 @@ DSH 没有可独立复用的用量组件或 Slot，因此本行把自己的原�
   出现这一行。
 - 弹窗展示的是 `compaction/summary` 事件里摘要调用自己上报的用量；该事件没有
   每次尝试的 route 列表与推理 token，因此弹窗不显示这两行。
-- 悬停提示用的是原生 `title`，不是 App 的自定义 Tooltip 气泡：插件不允许加载
-  `dsh-client-ui-primitives`，而复刻那套 portal/焦点实现超出了这一行的范围。
+- 图标使用公开的 `dsh-client-ui-primitives` 导出，跟随宿主主题。
+- 悬停提示目前仍使用原生 `title`。

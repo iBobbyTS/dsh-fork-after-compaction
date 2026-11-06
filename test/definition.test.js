@@ -57,6 +57,7 @@ function loadPlugin() {
         assert.equal(spec.id, '@local/dsh-fork-after-compaction')
         module = spec.factory((name) => {
           if (name === 'react') return fakeReact
+          if (name === '@deepseek-ai/dsh-client-ui-primitives') return Object.fromEntries(['Branch', 'Copy', 'Check', 'Database'].map(name => ['Icon' + name + 'OutlineRegular', props => createElement('svg', props)]))
           assert.equal(name, 'react-dom')
           return fakeReactDom
         })

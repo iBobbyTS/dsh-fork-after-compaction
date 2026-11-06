@@ -88,6 +88,5 @@ rendered before it activates are covered too.
 - The dialog reads the usage the `compaction/summary` event reports for the
   summarizer call; that event carries no per-attempt route list or reasoning
   token split, so those two rows are absent.
-- Tooltips are native `title` attributes rather than the app's custom tooltip
-  bubble: a plugin may not load `dsh-client-ui-primitives`, and copying the
-  portal/focus implementation was out of scope for this row.
+- Icons use the public, theme-aware `dsh-client-ui-primitives` exports.
+- Tooltips currently use native `title` attributes.
