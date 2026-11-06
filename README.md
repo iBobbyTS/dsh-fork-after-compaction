@@ -6,6 +6,10 @@ Adds an action row below each successful DSH context compaction: copy its summar
 
 The ordinary Turn-tail branch action cuts at `turn/end`, which can precede a manual compaction. This plugin forks at `compaction/end`, so the new session inherits the compacted checkpoint. Content produced after that compaction is intentionally excluded.
 
+## Compatibility
+
+Verified: DSH 0.2.2-rc.1 (source review and automated checks); Desktop testing has not been completed.
+
 ## Install
 
 For Desktop, launch the app once, quit it, and run the command below with its bundled CLI.
